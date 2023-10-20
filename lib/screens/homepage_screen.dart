@@ -79,11 +79,17 @@ class HomePageScreen extends StatelessWidget {
                         child: TopItems(
                           label: topItemsData[i]['label'],
                           image: topItemsData[i]['image'],
+                          onTap: (){
+                            showDialog(
+                              context: context,
+                              builder: (context) => _CustomDialog(label: topItemsData[i]['label'])
+                            );
+                          },
                         ),
                       );
                     }),
               ),
-              BannersWidget(),
+              const BannersWidget(),
               SizedBox(
                 height: 100.0,
                 child: ListView.builder(
@@ -109,4 +115,192 @@ class HomePageScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class _CustomDialog extends StatefulWidget {
+  final String label;
+  const _CustomDialog({super.key, required this.label});
+
+  @override
+  State<_CustomDialog> createState() => _CustomDialogState();
+}
+
+class _CustomDialogState extends State<_CustomDialog> {
+
+  int index = 0;
+  final PageController _pageController = PageController();
+
+  final List<Widget> _list = [
+    Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16.0),
+            image: const DecorationImage(
+                image: AssetImage(
+                    "assets/images/story1.jpeg"
+                ),
+                fit: BoxFit.fitHeight
+            )
+        ),
+      ),
+    ),
+    Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16.0),
+            image: const DecorationImage(
+                image: AssetImage(
+                    "assets/images/story2.jpeg"
+                ),
+                fit: BoxFit.cover
+            )
+        ),
+      ),
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) => SafeArea(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      // elevation: 0.0,
+      // shadowColor: Colors.transparent,
+      // surfaceTintColor: Colors.transparent,
+      // backgroundColor: Colors.black12,
+      children: [
+        Card(
+          margin: EdgeInsets.all(16.0),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                SizedBox(
+                  height: 50,
+                  width: 50,
+                  child: Container(
+                    padding: const EdgeInsets.all(2.0),
+                    decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xffffa5c5),
+                            Color(0xffd58cff)
+                          ],
+                        ),
+                        shape: BoxShape.circle),
+                    child: DecoratedBox(
+                      decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle),
+                      child: Container(
+                        margin: const EdgeInsets.all(2.0),
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            image: AssetImage(
+                              'assets/images/story1.jpeg'
+                            ),
+                            fit: BoxFit.cover
+                          )
+                        ),
+                        child: const SizedBox.expand(),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox( width: 10.0,),
+                Text(
+                  widget.label,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.primary
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                    onPressed: (){
+                      //TODO
+                    },
+                    icon: Image.asset('assets/images/bookmark.png', width: 20.0,)
+                ),
+                const CloseButton()
+              ],
+            ),
+          ),
+        ),
+        Expanded(
+          child: GestureDetector(
+            onTap: (){
+               if(index == _list.length-1){
+                 _pageController.animateToPage(0, duration: const Duration(seconds: 1), curve: Curves.fastOutSlowIn);
+                 return;
+               }
+               _pageController.animateToPage(index+1, duration: const Duration(seconds: 1), curve: Curves.fastOutSlowIn);
+               },
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                PageView(
+                  controller: _pageController,
+                  onPageChanged: (int i) => setState(() => index = i),
+                  children: _list
+                ),
+                Positioned(
+                  top: 12.0,
+                  right: 28.0,
+                  left: 28.0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      for(int i = 0; i < _list.length; i++)
+                        Expanded(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            margin: const EdgeInsets.symmetric(horizontal: 2.0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12.0),
+                              color: i <= index ? const Color(0xff5d0d8b) : Colors.black12,
+                            ),
+                            height: 6.0,
+                            child: const SizedBox.expand(),
+                          ),
+                        )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 20.0,
+        ),
+        Container(
+          width: 80.0,
+          height: 80.0,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/bottom_slider.png')
+            )
+          ),
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 5.0,
+              ),
+              Image.asset('assets/images/bottom_arrow.png', height: 20.0,),
+              Text('swipe up',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).colorScheme.primary
+              ),
+              ),
+              Text('grab this offer',
+                  style: Theme.of(context).textTheme.bodyLarge
+              )
+            ],
+          ),
+        )
+      ],
+    ),
+  );
 }
